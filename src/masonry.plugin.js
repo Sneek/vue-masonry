@@ -1,4 +1,3 @@
-import Vue from 'vue'
 import Masonry from 'masonry-layout'
 import ImageLoaded from 'imagesloaded'
 
@@ -30,12 +29,11 @@ const collectOptions = function (attrs) {
   })
   return res
 }
-
-const Events = new Vue({})
-
 export const VueMasonryPlugin = function () {}
 
 VueMasonryPlugin.install = function (Vue, options) {
+  VueMasonryPlugin.Events = new Vue({});
+
   Vue.directive('masonry', {
     props: ['transitionDuration', ' itemSelector'],
 
@@ -52,45 +50,45 @@ VueMasonryPlugin.install = function (Vue, options) {
         masonryDraw()
       })
 
-      Events.$on(EVENT_ADD, function (eventData) {
+      VueMasonryPlugin.Events.$on(EVENT_ADD, function (eventData) {
         masonryDraw()
       })
-      Events.$on(EVENT_REMOVE, function (eventData) {
+      VueMasonryPlugin.Events.$on(EVENT_REMOVE, function (eventData) {
         masonryDraw()
       })
-      Events.$on(EVENT_IMAGE_LOADED, function (eventData) {
+      VueMasonryPlugin.Events.$on(EVENT_IMAGE_LOADED, function (eventData) {
         masonryDraw()
       })
-      Events.$on(EVENT_DESTROY, function (eventData) {
+      VueMasonryPlugin.Events.$on(EVENT_DESTROY, function (eventData) {
         masonry.destroy()
       })
     },
     unbind: function (el, nodeObj) {
-      Events.$emit(EVENT_DESTROY)
+      VueMasonryPlugin.Events.$emit(EVENT_DESTROY)
     }
   })
 
   Vue.directive('masonryTile', {
 
     inserted: function (el) {
-      Events.$emit(EVENT_ADD, {
+      VueMasonryPlugin.Events.$emit(EVENT_ADD, {
         'element': el
       })
       // eslint-disable-next-line
       new ImageLoaded(el, function () {
-        Events.$emit(EVENT_IMAGE_LOADED, {
+        VueMasonryPlugin.Events.$emit(EVENT_IMAGE_LOADED, {
           'element': el
         })
       })
     },
     beforeDestroy: function (el) {
-      Events.$emit(EVENT_REMOVE, {
+      VueMasonryPlugin.Events.$emit(EVENT_REMOVE, {
         'element': el
       })
     }
   })
 
   Vue.prototype.$redrawVueMasonry = function () {
-    Events.$emit(EVENT_ADD)
+    VueMasonryPlugin.Events.$emit(EVENT_ADD)
   }
 }
